@@ -2,7 +2,7 @@ meeting = [
     {
         'ID': 'BK001',
         'ten_phong': 'Phòng Thảo Luận A',
-        'ten_nguoi_dat': 'Phòng marketing',
+        'ten_nguoi_dat': 'Phòng Marketing',
         'gio_bat_dau': 9,
         'gio_ket_thuc': 12,
         'tong_thoi_gian': 3,
@@ -11,25 +11,32 @@ meeting = [
 ]
 
 
+def xep_loai(tong_gio):
+    if tong_gio < 2:
+        return 'Ngắn'
+    elif tong_gio < 4:
+        return 'Tiêu chuẩn'
+    elif tong_gio < 6:
+        return 'Dài'
+    else:
+        return 'Quá tải (Cần xem xét lại)'
+
+
 def booking_show():
     if not meeting:
         print('Hiện tại không có cuộc họp nào')
         return
 
     print('-' * 130)
-    print('{:10} {:25} {:25} {:15} {:15} {:15} {:20}'.format(
-        'ID',
-        'Tên phòng',
-        'Người đặt',
-        'Bắt đầu',
-        'Kết thúc',
-        'Tổng giờ',
-        'Phân loại'
+    print('{:10} {:25} {:25} {:15} {:15} {:15} {:25}'.format(
+        'ID', 'Tên phòng', 'Người đặt',
+        'Bắt đầu', 'Kết thúc',
+        'Tổng giờ', 'Phân loại'
     ))
     print('-' * 130)
 
     for item in meeting:
-        print('{:10} {:25} {:25} {:15} {:15} {:15} {:20}'.format(
+        print('{:10} {:25} {:25} {:15} {:15} {:15} {:25}'.format(
             item['ID'],
             item['ten_phong'],
             item['ten_nguoi_dat'],
@@ -41,59 +48,49 @@ def booking_show():
 
 
 def sig_meeting():
-    id_BK = input('Nhập mã BK: ').strip()
-
-    if not id_BK:
-        print('Mã BK không được để trống!')
-        return
+    id_BK = input('Nhập mã BK: ').strip().upper()
 
     for item in meeting:
         if item['ID'] == id_BK:
             print('Mã BK đã tồn tại!')
             return
 
-    name_meeting = input('Nhập tên phòng họp: ').strip()
-    if not name_meeting:
-        print('Tên phòng không được để trống!')
+    ten_phong = input('Nhập tên phòng họp: ').strip()
+    ten_nguoi_dat = input('Nhập tên người đặt: ').strip()
+
+    try:
+        gio_bat_dau = int(input('Nhập giờ bắt đầu (0-24): '))
+        gio_ket_thuc = int(input('Nhập giờ kết thúc (0-24): '))
+    except ValueError:
+        print('Giờ phải là số!')
         return
 
-    name_order = input('Nhập tên người đặt: ').strip()
-    if not name_order:
-        print('Tên người đặt không được để trống!')
+    if not (0 <= gio_bat_dau <= 24 and 0 <= gio_ket_thuc <= 24):
+        print('Giờ phải nằm trong khoảng 0-24')
         return
 
-    hour_start = int(input('Nhập giờ bắt đầu (0-24): '))
-    hour_end = int(input('Nhập giờ kết thúc (0-24): '))
-
-    if hour_start >= hour_end:
+    if gio_bat_dau >= gio_ket_thuc:
         print('Giờ kết thúc phải lớn hơn giờ bắt đầu!')
         return
 
-    tong_thoi_gian = hour_end - hour_start
-
-    if 2 <= hour_start:
-        phan_loai = 'Ngắn'
-    elif 2 <= hour_start < 4:
-        phan_loai = 'Tiêu chuẩn'
-    elif 4 <= hour_start < 6:
-        phan_loai = 'Dài'
-    else:
-        phan_loai = 'quá tải(Cần xem xét lại)'
+    tong_thoi_gian = gio_ket_thuc - gio_bat_dau
+    phan_loai = xep_loai(tong_thoi_gian)
 
     meeting.append({
         'ID': id_BK,
-        'ten_phong': name_meeting,
-        'ten_nguoi_dat': name_order,
-        'gio_bat_dau': hour_start,
-        'gio_ket_thuc': hour_end,
+        'ten_phong': ten_phong,
+        'ten_nguoi_dat': ten_nguoi_dat,
+        'gio_bat_dau': gio_bat_dau,
+        'gio_ket_thuc': gio_ket_thuc,
         'tong_thoi_gian': tong_thoi_gian,
         'phan_loai': phan_loai
     })
 
     print('Đăng ký phòng họp thành công!')
 
+
 def update_booking():
-    booking_id = input('Nhập mã BK cần cập nhật: ').strip()
+    booking_id = input('Nhập mã BK cần cập nhật: ').strip().upper()
 
     for item in meeting:
         if item['ID'] == booking_id:
@@ -106,31 +103,27 @@ def update_booking():
                 f"Tên người đặt mới ({item['ten_nguoi_dat']}): "
             ).strip()
 
-            gio_bat_dau = int(
-                input(f"Giờ bắt đầu mới ({item['gio_bat_dau']}): ")
-            )
+            try:
+                gio_bat_dau = int(
+                    input(f"Giờ bắt đầu mới ({item['gio_bat_dau']}): ")
+                )
 
-            gio_ket_thuc = int(
-                input(f"Giờ kết thúc mới ({item['gio_ket_thuc']}): ")
-            )
+                gio_ket_thuc = int(
+                    input(f"Giờ kết thúc mới ({item['gio_ket_thuc']}): ")
+                )
+            except ValueError:
+                print('Giờ phải là số!')
+                return
 
             if gio_bat_dau >= gio_ket_thuc:
                 print('Giờ kết thúc phải lớn hơn giờ bắt đầu!')
                 return
 
             tong_thoi_gian = gio_ket_thuc - gio_bat_dau
+            phan_loai = xep_loai(tong_thoi_gian)
 
-            if 2 <= hour_start:
-                phan_loai = 'Ngắn'
-            elif 2 <= hour_start < 4:
-                phan_loai = 'Tiêu chuẩn'
-            elif 4 <= hour_start < 6:
-                phan_loai = 'Dài'
-            else:
-                phan_loai = 'quá tải(Cần xem xét lại)'
-
-            item['ten_phong'] = ten_phong
-            item['ten_nguoi_dat'] = ten_nguoi_dat
+            item['ten_phong'] = ten_phong or item['ten_phong']
+            item['ten_nguoi_dat'] = ten_nguoi_dat or item['ten_nguoi_dat']
             item['gio_bat_dau'] = gio_bat_dau
             item['gio_ket_thuc'] = gio_ket_thuc
             item['tong_thoi_gian'] = tong_thoi_gian
@@ -143,40 +136,61 @@ def update_booking():
 
 
 def delete_booking():
-    booking_id = input('Nhập mã BK cần xóa: ').strip()
+    booking_id = input('Nhập mã BK cần xóa: ').strip().upper()
 
     for item in meeting:
         if item['ID'] == booking_id:
-            if item == meeting.remove(item):
-                print('Bạn có chắc chắn muốn hủy lịch đặt phòng này không!')
-                
-            
-            print('Xóa thành công!')
+
+            confirm = input(
+                'Bạn có chắc muốn xóa? (Y/N): '
+            ).upper()
+
+            if confirm == 'Y':
+                meeting.remove(item)
+                print('Xóa thành công!')
+            else:
+                print('Đã hủy thao tác!')
+
             return
 
     print('Không tìm thấy mã BK!')
 
+
 def search_booking():
-    booking_id = input('Nhập mã BK cần tìm: ').strip()
+    booking_id = input('Nhập mã BK cần tìm: ').strip().upper()
 
     for item in meeting:
         if item['ID'] == booking_id:
-            print(item)
+            print('\nThông tin cuộc họp:')
+            for k, v in item.items():
+                print(f'{k}: {v}')
             return
 
     print('Không tìm thấy cuộc họp!')
+
 
 def show_total_hour():
     if not meeting:
         print('Không có dữ liệu')
         return
 
-    total = 0
+    tong_gio = sum(item['tong_thoi_gian'] for item in meeting)
 
-    for item in meeting:
-        total += item['tong_thoi_gian']
+    ngan = sum(1 for i in meeting if i['phan_loai'] == 'Ngắn')
+    tieu_chuan = sum(1 for i in meeting if i['phan_loai'] == 'Tiêu chuẩn')
+    dai = sum(1 for i in meeting if i['phan_loai'] == 'Dài')
+    qua_tai = sum(
+        1 for i in meeting
+        if i['phan_loai'] == 'Quá tải (Cần xem xét lại)'
+    )
 
-    print(f'Tổng thời lượng sử dụng của tất cả cuộc họp: {total} giờ')
+    print('\n===== THỐNG KÊ =====')
+    print(f'Tổng số giờ sử dụng: {tong_gio}')
+    print(f'Cuộc họp ngắn: {ngan}')
+    print(f'Cuộc họp tiêu chuẩn: {tieu_chuan}')
+    print(f'Cuộc họp dài: {dai}')
+    print(f'Cuộc họp quá tải: {qua_tai}')
+
 
 def menu():
     while True:
@@ -187,7 +201,7 @@ def menu():
         print('4. Xóa cuộc họp')
         print('5. Tìm cuộc họp theo mã BK')
         print('6. Thống kê thời lượng')
-        print('7. Phân loại cuộc họp')
+        print('7. Lọc theo phân loại')
         print('8. Thoát')
 
         choice = input('Chọn chức năng: ')
@@ -208,10 +222,10 @@ def menu():
             case '7':
                 print('')
             case '8':
-                print('Bạn đã thoát chương trình')
+                print('Bạn đã thoát chương trình!')
                 break
             case _:
-                print('Lỗi: Vui lòng nhập đúng chức năng')
+                print('Vui lòng chọn từ 1-8')
 
 
 menu()
