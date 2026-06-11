@@ -62,8 +62,8 @@ def sig_meeting():
         print('Tên người đặt không được để trống!')
         return
 
-    hour_start = int(input('Nhập giờ bắt đầu (0-23): '))
-    hour_end = int(input('Nhập giờ kết thúc (0-23): '))
+    hour_start = int(input('Nhập giờ bắt đầu (0-24): '))
+    hour_end = int(input('Nhập giờ kết thúc (0-24): '))
 
     if hour_start >= hour_end:
         print('Giờ kết thúc phải lớn hơn giờ bắt đầu!')
@@ -71,12 +71,14 @@ def sig_meeting():
 
     tong_thoi_gian = hour_end - hour_start
 
-    if 8 <= hour_start < 17:
+    if 2 <= hour_start:
+        phan_loai = 'Ngắn'
+    elif 2 <= hour_start < 4:
         phan_loai = 'Tiêu chuẩn'
-    elif 17 <= hour_start < 22:
-        phan_loai = 'Ngoài giờ'
+    elif 4 <= hour_start < 6:
+        phan_loai = 'Dài'
     else:
-        phan_loai = 'Đặc biệt'
+        phan_loai = 'quá tải(Cần xem xét lại)'
 
     meeting.append({
         'ID': id_BK,
@@ -118,12 +120,14 @@ def update_booking():
 
             tong_thoi_gian = gio_ket_thuc - gio_bat_dau
 
-            if 8 <= gio_bat_dau < 17:
+            if 2 <= hour_start:
+                phan_loai = 'Ngắn'
+            elif 2 <= hour_start < 4:
                 phan_loai = 'Tiêu chuẩn'
-            elif 17 <= gio_bat_dau < 22:
-                phan_loai = 'Ngoài giờ'
+            elif 4 <= hour_start < 6:
+                phan_loai = 'Dài'
             else:
-                phan_loai = 'Đặc biệt'
+                phan_loai = 'quá tải(Cần xem xét lại)'
 
             item['ten_phong'] = ten_phong
             item['ten_nguoi_dat'] = ten_nguoi_dat
@@ -143,7 +147,10 @@ def delete_booking():
 
     for item in meeting:
         if item['ID'] == booking_id:
-            meeting.remove(item)
+            if item == meeting.remove(item):
+                print('Bạn có chắc chắn muốn hủy lịch đặt phòng này không!')
+                
+            
             print('Xóa thành công!')
             return
 
@@ -201,7 +208,7 @@ def menu():
             case '7':
                 print('')
             case '8':
-                print('Thoát chương trình')
+                print('Bạn đã thoát chương trình')
                 break
             case _:
                 print('Lỗi: Vui lòng nhập đúng chức năng')
